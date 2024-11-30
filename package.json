@@ -1,0 +1,25 @@
+{
+  "name": "video-streaming-preparator",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm run --parallel dev",
+    "build": "pnpm run --parallel build",
+    "start": "pnpm run --parallel start",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build:frontend": "pnpm --filter frontend build",
+    "start:frontend": "pnpm --filter frontend start",
+    "test:frontend": "pnpm --filter frontend test",
+    "dev:backend": "pnpm --filter backend dev",
+    "build:backend": "pnpm --filter backend build",
+    "test:backend": "pnpm --filter backend test",
+    "deploy:backend": "pnpm --filter backend deploy"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
+

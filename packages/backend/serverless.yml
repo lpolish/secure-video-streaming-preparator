@@ -1,0 +1,62 @@
+service: video-streaming-preparator-backend
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  environment:
+    S3_BUCKET_NAME: ${self:custom.s3BucketName}
+    DYNAMODB_TABLE_NAME: ${self:custom.dynamodbTableName}
+
+custom:
+  s3BucketName: ${self:service}-${self:provider.stage}-videos
+  dynamodbTableName: ${self:service}-${self:provider.stage}-videos
+
+functions:
+  upload:
+    handler: src/handlers/upload.handler
+    events:
+      - http:
+          path: upload
+          method: post
+  process:
+    handler: src/handlers/process.handler
+    events:
+      - s3:
+          bucket: ${self:custom.s3BucketName}
+          event: s3:ObjectCreated:*
+  download:
+    handler: src/handlers/download.handler
+    events:
+      - http:
+          path: download/{id}
+          method: get
+  publish:
+    handler: src/handlers/publish.handler
+    events:
+      - http:
+          path: publish/{id}
+          method: post
+
+resources:
+  Resources:
+    VideoBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.s3BucketName}
+    VideoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.dynamodbTableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+plugins:
+  - serverless-plugin-typescript
+
